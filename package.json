@@ -13,24 +13,32 @@
 		"lint:client": "pnpm --filter client lint",
 		"lint": "pnpm --stream --color --filter \"./apps/**\" lint",
 		"test:server": "pnpm --filter server test",
-		"build:admin": "pnpm --filter admin build",
-		"build:client": "pnpm --filter client build",
-		"build": "pnpm --stream --color --filter \"./apps/**\" build",
 		"start:server": "pnpm --filter server start",
 		"start:admin": "pnpm --filter admin start",
 		"start:client": "pnpm --filter client start",
-		"start": "pnpm --stream --color --filter \"./apps/**\" start"
+		"start": "pnpm --stream --color --filter \"./apps/**\" start",
+		"graph": "pnpm exec nx graph",
+		"build": "pnpm exec nx run-many -t build"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"database": "link:packages\\database",
+		"next": "~15.1.4",
+		"react": "19.0.0",
+		"react-dom": "19.0.0",
 		"types": "link:packages\\types"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"sharp"
 		]
+	},
+	"devDependencies": {
+		"@nx/eslint": "20.4.5",
+		"@nx/next": "20.4.5",
+		"eslint": "~8.57.0",
+		"nx": "20.4.5"
 	}
 }
