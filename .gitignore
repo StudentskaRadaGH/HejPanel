@@ -8,10 +8,8 @@ pnpm-lock.yaml
 
 **/pnpm-lock.yaml
 
+**/.next
 
-.nx/cache
-.nx/workspace-data
+**/out
 
-# Next.js
-.next
-out
+**/dist
