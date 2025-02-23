@@ -1,21 +1,78 @@
+@import "normalize.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--f-nunito: "Nunito";
+	--f-hepta-slab: "Hepta Slab";
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.nunito {
+	font-family: var(--f-nunito);
+}
+
+.hepta-slab {
+	font-family: var(--f-hepta-slab);
+}
+
+/*
+  Default element styles
+ */
+html,
+body {
+	width: 100dvw;
+	min-height: 100dvh;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	overflow: hidden;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+	font-family: var(--f-hepta-slab);
+}
+
+/*
+	Scrollbar
+ */
+* {
+	--scroll-width: 8px;
+	--scroll-thumb: #00000030;
+	--scroll-track: #0000000d;
+}
+
+*:hover {
+	--scroll-thumb: #0000006b;
+	--scroll-track: #0000001a;
+}
+
+*::-webkit-scrollbar {
+	width: var(--scroll-width);
+	height: var(--scroll-width);
+}
+
+*::-webkit-scrollbar-thumb {
+	background: var(--scroll-thumb);
+	border-radius: var(--scroll-width);
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--scroll-track);
+	border-radius: var(--scroll-width);
+}
+
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+@layer utilities {
+	.items-center {
+		align-items: safe center;
+	}
+
+	.justify-center {
+		justify-content: safe center;
+	}
 }
