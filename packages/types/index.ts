@@ -1,1 +1,2 @@
-export type TestType = "test";
+export * from "./types";
+export * from "./constants";

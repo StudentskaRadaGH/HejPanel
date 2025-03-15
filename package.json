@@ -4,6 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"migrate": "pnpm --filter database migrate",
+		"tinker": "pnpm --filter database tinker",
 		"dev:server": "pnpm --filter server dev",
 		"dev:admin": "pnpm --filter admin dev",
 		"dev:client": "pnpm --filter client dev",
@@ -26,7 +28,8 @@
 	"license": "ISC",
 	"dependencies": {
 		"database": "link:packages\\database",
-		"types": "link:packages\\types"
+		"types": "link:packages\\types",
+		"env": "link:packages\\env"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [

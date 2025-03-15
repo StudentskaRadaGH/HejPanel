@@ -1,26 +1,27 @@
-import { printConnect, printDisconnect, printHydratedData, printRestartingSync, printSentDataToUID, printServerReady, printStartupScreen, printSuspendingSync } from "./utils/print";
+import "jsr:@std/dotenv/load";
 
-import { CanteenManager } from "./managers/canteenManager";
-import { ConfigurationManager } from "./managers/configurationManager";
-import { DeparturesManager } from "./managers/departuresManager";
-import { PanelsManager } from "./managers/panelsManager";
-import { Server } from "socket.io";
-import { createServer } from "node:http";
-import express from "express";
-import { privateEnv } from "env";
+import { Application, Router } from "https://deno.land/x/oak@v17.1.0/mod.ts";
+import { printConnect, printDisconnect, printHydratedData, printRestartingSync, printSentDataToUID, printServerReady, printStartupScreen, printSuspendingSync } from "./utils/print.ts";
 
-const REST_API = express();
-REST_API.use(express.json());
+import { CanteenManager } from "./managers/canteenManager.ts";
+import { ConfigurationManager } from "./managers/configurationManager.ts";
+import { DeparturesManager } from "./managers/departuresManager.ts";
+import { PanelsManager } from "./managers/panelsManager.ts";
+import { Server as SocketIoServer } from "https://deno.land/x/socket_io@0.2.0/mod.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
-const WS_SERVER = new Server({
+console.clear();
+
+const io = new SocketIoServer({
 	cors: {
-		origin: [privateEnv.ADMIN_URL, privateEnv.CLIENT_URL],
+		origin: "*",
+		// origin: [Deno.env.get("PANEL_URL")!, Deno.env.get("ADMIN_URL")!],
 	},
 });
 
 let numberOfConnections = 0;
 
-WS_SERVER.on("connection", async (socket) => {
+io.on("connection", async (socket) => {
 	printConnect(socket.id);
 
 	if (!tickInterval) {
@@ -54,30 +55,30 @@ WS_SERVER.on("connection", async (socket) => {
 	});
 });
 
-let tickInterval: NodeJS.Timeout | null = null;
+let tickInterval: number | null = null;
 const tickRate = 10_000; // 10 seconds
 const tickManagers = () => Promise.all([panels.tick(), canteen.tick(), departures.tick()]);
 
 const configuration = new ConfigurationManager({
 	onThemeChange: (theme) => {
-		WS_SERVER.emit("theme", theme);
+		io.emit("theme", theme);
 		printHydratedData("theme");
 		return Promise.resolve();
 	},
 	onTimetableEnabledChange: (enabled) => {
-		WS_SERVER.emit("timetable:enable", enabled);
+		io.emit("timetable:enable", enabled);
 		printHydratedData("timetableEnabled");
 		return Promise.resolve();
 	},
 	onCanteenEnabledChange: async (enabled) => {
-		WS_SERVER.emit("canteen:enable", enabled);
+		io.emit("canteen:enable", enabled);
 		printHydratedData("canteenEnabled");
 
 		if (enabled) await canteen.enable();
 		else await canteen.disable();
 	},
 	onDeparturesEnabledChange: async (enabled) => {
-		WS_SERVER.emit("departures:enable", enabled);
+		io.emit("departures:enable", enabled);
 		printHydratedData("departuresEnabled");
 
 		if (enabled) await departures.enable();
@@ -86,71 +87,76 @@ const configuration = new ConfigurationManager({
 });
 
 const canteen = new CanteenManager((canteen) => {
-	WS_SERVER.emit("canteen:update", canteen);
+	io.emit("canteen:update", canteen);
 	printHydratedData("canteen");
 });
 
 const departures = new DeparturesManager((departures) => {
-	WS_SERVER.emit("departures:update", departures);
+	io.emit("departures:update", departures);
 	printHydratedData("departures");
 });
 
 const panels = new PanelsManager({
 	onAddPanel: (panel) => {
-		WS_SERVER.emit("panel:add", panel);
+		io.emit("panel:add", panel);
 		printHydratedData("visible panel (ID: " + panel.id + ")");
 	},
 	onRemovePanel: (panelId) => {
-		WS_SERVER.emit("panel:remove", panelId);
+		io.emit("panel:remove", panelId);
 		printHydratedData("hidden panel (ID: " + panelId + ")");
 	},
 });
 
-REST_API.get("/", (req, res) => {
-	res.status(200).send({
+const router = new Router();
+
+router.get("/", ({ response }) => {
+	response.body = {
 		name: "HejPanel API",
 		version: "1.0.0",
-		status: "All systems operational",
-	});
+		status: "running",
+		message: "All systems nominal ✅👍🔥😉",
+	};
 });
 
-REST_API.post("/configuration", async (req, res) => {
+router.post("/configuration", async ({ response }) => {
 	await configuration.dataSourceChanged();
 
-	res.status(200);
+	response.status = 200;
 });
 
-REST_API.post("/canteen", async (req, res) => {
+router.post("/canteen", async ({ response }) => {
 	await canteen.dataSourceChanged();
 
-	res.status(200);
+	response.status = 200;
 });
 
-REST_API.post("/panels", async (req, res) => {
+router.post("/panels", async ({ response }) => {
 	await panels.dataSourceChanged();
 
-	res.status(200);
+	response.status = 200;
 });
 
 // #region Server startup...
 printStartupScreen();
 
-configuration
-	.init()
-	.then(() => {
-		const { canteenEnabled, departuresEnabled } = configuration.current;
+await configuration.init().then(() => {
+	const { canteenEnabled, departuresEnabled } = configuration.current;
 
-		canteen.enabled = canteenEnabled;
-		departures.enabled = departuresEnabled;
-	})
-	.then(async () => await Promise.all([REST_API.listen(privateEnv.SERVER_PORT), WS_SERVER.listen(privateEnv.WS_PORT)]))
-	.then(printServerReady);
+	canteen.enabled = canteenEnabled;
+	departures.enabled = departuresEnabled;
+});
 
-// WS_SERVER.listen(privateEnv.WS_PORT);
+new Application()
+	.use(router.routes())
+	.use(router.allowedMethods())
+	.listen({
+		port: parseInt(Deno.env.get("API_PORT")!),
+	});
 
-// serve(WS_SERVER.handler(), {
-// 	port: parseInt(Deno.env.get("WS_PORT")!),
-// 	onListen: () => null,
-// });
+serve(io.handler(), {
+	port: parseInt(Deno.env.get("WS_PORT")!),
+	onListen: () => null,
+});
 
-//#endregion
+printServerReady();
+// #endregion
