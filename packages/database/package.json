@@ -14,10 +14,10 @@
 	"devDependencies": {
 		"@types/pg": "^8.11.11",
 		"drizzle-kit": "^0.30.5",
-		"typescript": "^5.7.3"
+		"typescript": "^5.8.2"
 	},
 	"dependencies": {
 		"drizzle-orm": "^0.40.0",
-		"pg": "^8.13.3"
+		"pg": "^8.14.0"
 	}
 }

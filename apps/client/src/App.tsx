@@ -1,5 +1,13 @@
+import useClientState from "./util/getClientState";
+
 function App() {
-	return <></>;
+	const data = useClientState();
+
+	return (
+		<>
+			<pre>{JSON.stringify(data, null, 4)}</pre>
+		</>
+	);
 }
 
 export default App;

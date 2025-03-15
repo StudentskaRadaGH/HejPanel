@@ -14,7 +14,6 @@
 		"lint:admin": "pnpm --filter admin lint",
 		"lint:client": "pnpm --filter client lint",
 		"lint": "pnpm --stream --color --filter \"./apps/**\" lint",
-		"test:server": "pnpm --filter server test",
 		"build:admin": "pnpm --filter admin build",
 		"build:client": "pnpm --filter client build",
 		"build": "pnpm --stream --color --filter \"./apps/**\" build",
