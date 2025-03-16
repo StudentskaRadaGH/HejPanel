@@ -1,40 +1,52 @@
 {
-	"name": "hejpanel",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"migrate": "pnpm --filter database migrate",
-		"tinker": "pnpm --filter database tinker",
-		"dev:server": "pnpm --filter server dev",
-		"dev:admin": "pnpm --filter admin dev",
-		"dev:client": "pnpm --filter client dev",
-		"dev": "pnpm --stream --color --filter \"./apps/**\" dev",
-		"lint:server": "pnpm --filter server lint",
-		"lint:admin": "pnpm --filter admin lint",
-		"lint:client": "pnpm --filter client lint",
-		"lint": "pnpm --stream --color --filter \"./apps/**\" lint",
-		"build:admin": "pnpm --filter admin build",
-		"build:client": "pnpm --filter client build",
-		"build": "pnpm --stream --color --filter \"./apps/**\" build",
-		"start:server": "pnpm --filter server start",
-		"start:admin": "pnpm --filter admin start",
-		"start:client": "pnpm --filter client start",
-		"start": "pnpm --stream --color --filter \"./apps/**\" start"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"database": "link:packages\\database",
-		"types": "link:packages\\types",
-		"env": "link:packages\\env"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@swc/core",
-			"esbuild",
-			"sharp"
-		]
-	}
+  "name": "hejpanel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "pnpm --filter database migrate",
+    "tinker": "pnpm --filter database tinker",
+    "dev:server": "pnpm --filter server dev",
+    "dev:admin": "pnpm --filter admin dev",
+    "dev:client": "pnpm --filter client dev",
+    "dev": "pnpm --stream --color --filter \"./apps/**\" dev",
+    "lint:server": "pnpm --filter server lint",
+    "lint:admin": "pnpm --filter admin lint",
+    "lint:client": "pnpm --filter client lint",
+    "lint": "pnpm --stream --color --filter \"./apps/**\" lint",
+    "build:admin": "pnpm --filter admin build",
+    "build:client": "pnpm --filter client build",
+    "build": "pnpm --stream --color --filter \"./apps/**\" build",
+    "start:server": "pnpm --filter server start",
+    "start:admin": "pnpm --filter admin start",
+    "start:client": "pnpm --filter client start",
+    "start": "pnpm --stream --color --filter \"./apps/**\" start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "database": "link:packages\\database",
+    "env": "link:packages\\env",
+    "types": "link:packages\\types",
+    "ui": "link:packages\\ui"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ],
+    "useTabs": false,
+    "tabWidth": 4
+  }
 }

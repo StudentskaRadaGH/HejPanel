@@ -1,13 +1,19 @@
-import useClientState from "./util/getClientState";
+import Carousel from "./carousel/Carousel";
+import { ClientStateProvider } from "./context";
+import Info from "./info/Info";
+import useClientState from "./useClientState";
 
 function App() {
-	const data = useClientState();
+    const clientState = useClientState();
 
-	return (
-		<>
-			<pre>{JSON.stringify(data, null, 4)}</pre>
-		</>
-	);
+    return (
+        <main className="grid h-dvh w-dvw grid-cols-[75fr,25fr]">
+            <ClientStateProvider clientState={clientState}>
+                <Carousel />
+                <Info />
+            </ClientStateProvider>
+        </main>
+    );
 }
 
 export default App;

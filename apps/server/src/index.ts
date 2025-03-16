@@ -5,10 +5,10 @@ import { ConfigurationManager } from "./managers/configurationManager";
 import { DeparturesManager } from "./managers/departuresManager";
 import { PanelsManager } from "./managers/panelsManager";
 import { Server } from "socket.io";
-import { createServer } from "node:http";
 import express from "express";
 import { privateEnv } from "env";
 
+// #region Server setup
 const REST_API = express();
 REST_API.use(express.json());
 
@@ -53,11 +53,15 @@ WS_SERVER.on("connection", async (socket) => {
 		}
 	});
 });
+// #endregion
 
+// #region Event loop setup
 let tickInterval: NodeJS.Timeout | null = null;
 const tickRate = 10_000; // 10 seconds
 const tickManagers = () => Promise.all([panels.tick(), canteen.tick(), departures.tick()]);
+// #endregion
 
+// #region Managers definition
 const configuration = new ConfigurationManager({
 	onThemeChange: (theme) => {
 		WS_SERVER.emit("theme", theme);
@@ -105,7 +109,9 @@ const panels = new PanelsManager({
 		printHydratedData("hidden panel (ID: " + panelId + ")");
 	},
 });
+// #endregion
 
+// #region Internal API definition
 REST_API.get("/", (req, res) => {
 	res.status(200).send({
 		name: "HejPanel API",
@@ -131,6 +137,7 @@ REST_API.post("/panels", async (req, res) => {
 
 	res.status(200);
 });
+// #endregion
 
 // #region Server startup...
 printStartupScreen();
@@ -145,12 +152,4 @@ configuration
 	})
 	.then(async () => await Promise.all([REST_API.listen(privateEnv.SERVER_PORT), WS_SERVER.listen(privateEnv.WS_PORT)]))
 	.then(printServerReady);
-
-// WS_SERVER.listen(privateEnv.WS_PORT);
-
-// serve(WS_SERVER.handler(), {
-// 	port: parseInt(Deno.env.get("WS_PORT")!),
-// 	onListen: () => null,
-// });
-
 //#endregion

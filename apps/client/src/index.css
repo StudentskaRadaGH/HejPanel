@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --f-nunito: "Nunito";
+}
+
+.nunito-normal {
+    font-weight: 400;
+}
+
+.nunito-bold {
+    font-weight: 800;
+}
+
+html,
+body {
+    width: 100dvw;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--f-nunito);
+    font-weight: 400;
+}
+
+svg {
+    height: 1em;
+    display: inline-block;
+}
+
+@layer utilities {
+    .items-center {
+        align-items: safe center;
+    }
+
+    .justify-center {
+        justify-content: safe center;
+    }
+}

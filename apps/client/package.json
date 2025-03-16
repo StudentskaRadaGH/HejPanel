@@ -9,6 +9,7 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
+		"lucide-react": "^0.476.0",
 		"normalize.css": "^8.0.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",

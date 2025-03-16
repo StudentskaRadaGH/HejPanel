@@ -1,14 +1,14 @@
-import { Canteen, ClientState, Departures, Panel, Theme } from "types";
+import { Canteen, ClientState, Departures, DisplayPanel, Theme } from "types";
 import { useEffect, useState } from "react";
 
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:4000");
+const socket = io("http://localhost:4000");
 
-export default function useSocket(): ClientState {
+export default function useClientState(): ClientState {
 	const [online, setOnline] = useState(socket.connected);
 
-	const [panels, setPanels] = useState<Panel[]>([]);
+	const [panels, setPanels] = useState<DisplayPanel[]>([]);
 
 	const [theme, setTheme] = useState<Theme>("normal");
 
@@ -35,8 +35,7 @@ export default function useSocket(): ClientState {
 		const onConnect = () => setOnline(true);
 		const onDisconnect = () => setOnline(false);
 
-		const onPanelSync = (newPanels: Panel[]) => setPanels(newPanels);
-		const onPanelAdd = (panel: Panel) => setPanels((panels) => [...panels, panel]);
+		const onPanelAdd = (panel: DisplayPanel) => setPanels((panels) => [...panels, panel]);
 		const onPanelRemove = (panelId: number) => setPanels((panels) => panels.filter((p) => p.id !== panelId));
 
 		const onThemeChange = (newTheme: Theme) => setTheme(newTheme);
@@ -56,12 +55,12 @@ export default function useSocket(): ClientState {
 			setCanteen(state.canteen);
 			setIsDeparturesEnabled(state.departuresEnabled);
 			setDepartures(state.departures);
+			setPanels(state.panels);
 		};
 
 		socket.on("connect", onConnect);
 		socket.on("disconnect", onDisconnect);
 
-		socket.on("panel:sync", onPanelSync);
 		socket.on("panel:add", onPanelAdd);
 		socket.on("panel:remove", onPanelRemove);
 
@@ -81,7 +80,6 @@ export default function useSocket(): ClientState {
 			socket.off("connect", onConnect);
 			socket.off("disconnect", onDisconnect);
 
-			socket.off("panel:sync", onPanelSync);
 			socket.off("panel:add", onPanelAdd);
 			socket.off("panel:remove", onPanelRemove);
 
