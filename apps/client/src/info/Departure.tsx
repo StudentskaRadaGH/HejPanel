@@ -7,17 +7,17 @@ interface DepartureProps {
 
 const Departure = ({ departure }: DepartureProps) => {
     return (
-        <div className="departure">
-            <span className="time">{departure.time}</span>
-            <span className="delay">
+        <>
+            <div className="nunito-bold">{departure.time}</div>
+            <div className="nunito-bold text-[0.6em]">
                 {departure.delay && `+${departure.delay}`}
-            </span>
-            <span className="line">
+            </div>
+            <div className="flex items-center gap-1">
                 <CarrierIcon carrier={departure.carrier} />
                 {departure.line}
-            </span>
-            <span className="destination">{departure.destination}</span>
-        </div>
+            </div>
+            <div className="">{departure.destination}</div>
+        </>
     );
 };
 

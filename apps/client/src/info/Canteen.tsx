@@ -55,7 +55,7 @@ const Canteen = () => {
                 !canteen.lunch1 &&
                 !canteen.lunch2 &&
                 !canteen.lunch3 && (
-                    <div className="no-meals">
+                    <div className="nunito-bold">
                         Na dnešek nejsou nahlášena žádná jídla
                     </div>
                 )}

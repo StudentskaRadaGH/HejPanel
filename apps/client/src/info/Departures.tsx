@@ -1,51 +1,42 @@
+import { Departure } from "types";
 import DepartureRow from "./Departure";
 import { useDepartures } from "../context";
+
+interface DeparturesFromStopProps {
+    name: string;
+    departures: Departure[];
+}
+
+const DeparturesFromStop = ({ name, departures }: DeparturesFromStopProps) => {
+    return (
+        <div className="grid w-full grid-cols-[auto,auto,auto,1fr] items-center gap-x-1 gap-y-2">
+            <div className="nunito-bold col-span-4 text-lg">{name}:</div>
+            {departures.map((departure) => (
+                <DepartureRow
+                    key={
+                        departure.line +
+                        departure.carrier +
+                        departure.destination.substring(-5)
+                    }
+                    departure={departure}
+                />
+            ))}
+        </div>
+    );
+};
 
 const Departures = () => {
     const departures = useDepartures();
 
     return (
-        <div className="departures-container">
-            <div className="departures">
-                <h2>Ladova:</h2>
-                {departures.ladova.map((departure) => (
-                    <DepartureRow
-                        key={
-                            departure.line +
-                            departure.carrier +
-                            departure.destination.substring(-5)
-                        }
-                        departure={departure}
-                    />
-                ))}
-            </div>
-            <div className="departures">
-                <h2>Na Trati:</h2>
-                {departures.natrati.map((departure) => (
-                    <DepartureRow
-                        key={
-                            departure.line +
-                            departure.carrier +
-                            departure.destination.substring(-5)
-                        }
-                        departure={departure}
-                    />
-                ))}
-            </div>
-            <div className="departures">
-                <h2>Vlak:</h2>
-                {departures.vlak.map((departure) => (
-                    <DepartureRow
-                        key={
-                            departure.line +
-                            departure.carrier +
-                            departure.destination.substring(-5)
-                        }
-                        departure={departure}
-                    />
-                ))}
-            </div>
-        </div>
+        <>
+            <DeparturesFromStop name="Ladova" departures={departures.ladova} />
+            <DeparturesFromStop
+                name="Na Trati"
+                departures={departures.natrati}
+            />
+            <DeparturesFromStop name="Vlak" departures={departures.vlak} />
+        </>
     );
 };
 

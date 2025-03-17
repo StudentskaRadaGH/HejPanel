@@ -19,7 +19,7 @@ const Info = () => {
 
     return (
         <div
-            className="flex h-full w-full flex-col items-center gap-4 bg-[var(--infoBackground)] p-10 text-[var(--infoText)]"
+            className="flex h-full w-full flex-col items-center gap-4 bg-[var(--infoBackground)] px-5 py-10 text-[var(--infoText)]"
             style={theme.cssVariables}
         >
             <Gytool
