@@ -1,4 +1,8 @@
-import { printClearedCache, printReadDataFromCache, printWrittenDataToDB } from "../utils/print";
+import {
+    printClearedCache,
+    printReadDataFromCache,
+    printWrittenDataToDB,
+} from "../utils/print";
 
 import type { Canteen } from "types";
 import { Manager } from "./manager";
@@ -6,85 +10,97 @@ import { db, Canteens, lt, eq } from "database";
 import fetchCanteens from "../crawlers/fetchCanteens";
 
 export class CanteenManager extends Manager<Canteen> {
-	protected override get dataName(): string {
-		return "canteen";
-	}
+    protected override get dataName(): string {
+        return "canteen";
+    }
 
-	public constructor(onUpdateCallback: (canteen: Canteen) => void) {
-		super((_oldData, newData) => onUpdateCallback(newData));
-	}
+    public constructor(onUpdateCallback: (canteen: Canteen) => void) {
+        super((_oldData, newData) => onUpdateCallback(newData));
+    }
 
-	protected override isStale = (lastUpdated: Date): boolean => {
-		const now = new Date();
+    protected override isStale = (lastUpdated: Date): boolean => {
+        const now = new Date();
 
-		return lastUpdated.getDate() !== now.getDate();
-	};
+        return lastUpdated.getDate() !== now.getDate();
+    };
 
-	protected override get emptyData(): Canteen {
-		return {
-			snack: null,
-			soup: null,
-			lunch1: null,
-			lunch2: null,
-			lunch3: null,
-			commonSuffix: null,
-		};
-	}
+    protected override get emptyData(): Canteen {
+        return {
+            snack: null,
+            soup: null,
+            lunch1: null,
+            lunch2: null,
+            lunch3: null,
+            commonSuffix: null,
+        };
+    }
 
-	protected override async getCurrent(): Promise<Canteen | null> {
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
+    protected override async getCurrent(): Promise<Canteen | null> {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-		// Garbage collection
-		await db.delete(Canteens).where(lt(Canteens.date, today)).execute();
-		printClearedCache("canteen");
+        const todayDate = CanteenManager.getDateKey(today);
 
-		if (today.getDay() === 0 || today.getDay() === 6) {
-			printReadDataFromCache("canteen");
-			return null;
-		}
+        // Garbage collection
+        await db.delete(Canteens).where(lt(Canteens.date, todayDate)).execute();
+        printClearedCache("canteen");
 
-		const canteen = await db.query.Canteens.findFirst({
-			where: eq(Canteens.date, today),
-		});
+        if (new Date().getDay() === 0 || new Date().getDay() === 6) {
+            printReadDataFromCache("canteen");
+            return null;
+        }
 
-		if (canteen) {
-			printReadDataFromCache("canteen", true);
-			return canteen;
-		}
+        const canteen = await db.query.Canteens.findFirst({
+            where: eq(Canteens.date, todayDate),
+        });
 
-		const fetchedCanteens = await fetchCanteens();
+        if (canteen) {
+            printReadDataFromCache("canteen", true);
+            return canteen;
+        }
 
-		let currentCanteen: Canteen | null = null;
-		let newCanteens = 0;
+        const fetchedCanteens = await fetchCanteens();
 
-		for (const fetchedCanteen of fetchedCanteens) {
-			const existingCanteen = await db.query.Canteens.findFirst({
-				where: eq(Canteens.date, fetchedCanteen.date),
-			});
+        let newCanteens =
+            (
+                await db
+                    .insert(Canteens)
+                    .values(
+                        fetchedCanteens.map(({ date, canteen }) => ({
+                            date,
+                            ...canteen,
+                        })),
+                    )
+                    .onConflictDoNothing()
+                    .execute()
+            ).rowCount ?? 0;
 
-			if (!existingCanteen) {
-				await db.insert(Canteens).values({
-					date: fetchedCanteen.date,
-					...fetchedCanteen.canteen,
-				});
-				newCanteens++;
-			}
+        let currentCanteen: Canteen | null = null;
 
-			if (fetchedCanteen.date === today) currentCanteen = existingCanteen ? existingCanteen : fetchedCanteen.canteen;
-		}
+        for (const canteen of fetchedCanteens)
+            if (canteen.date === todayDate) {
+                currentCanteen = canteen.canteen;
+                break;
+            }
 
-		if (!currentCanteen) {
-			await db.insert(Canteens).values({
-				date: today,
-				...this.emptyData,
-			});
+        if (!currentCanteen) {
+            await db.insert(Canteens).values({
+                date: todayDate,
+                ...this.emptyData,
+            });
 
-			newCanteens++;
-		}
+            currentCanteen = this.emptyData;
 
-		printWrittenDataToDB(`canteen × ${newCanteens}`);
+            newCanteens++;
+        }
 
-		return currentCanteen;
-	}
+        printWrittenDataToDB(`canteen × ${newCanteens}`);
+
+        return currentCanteen;
+    }
+
+    public static getDateKey = (date: Date): number =>
+        date.getFullYear() * 10_000 +
+        (date.getMonth() + 1) * 100 +
+        date.getDate();
 }
