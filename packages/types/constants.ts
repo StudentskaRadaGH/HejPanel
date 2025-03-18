@@ -1,7 +1,16 @@
-export const userTypes = ["suspended", "user", "admin", "super-admin"] as const;
+export const UserTypes = ["suspended", "user", "admin", "super-admin"] as const;
 
-export const panelTypes = ["text", "image", "video", "iframe"] as const;
+export const PanelDataTypes = ["text", "image", "video", "iframe"] as const;
 
-export const activityTypes = ["user:request:addPanel", "admin:accept", "admin:reject", "admin:addPanel", "admin:changeTime", "admin:changeVisibility", "admin:changeShowFor", "admin:changeContent"] as const;
+export const PanelEventTypes = [
+    "user:request:addPanel",
+    "admin:acceptPanel",
+    "admin:rejectPanel",
+    "admin:addPanel",
+    "admin:change:time",
+    "admin:change:visibilityOverride",
+    "admin:change:displayDuration",
+    "admin:change:panelData",
+] as const;
 
-export const themes = ["normal", "dark", "light"] as const;
+export const ThemeNames = ["normal", "dark", "light"] as const;

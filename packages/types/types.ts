@@ -1,197 +1,222 @@
 import { Dispatch, SetStateAction } from "react";
-import { activityTypes, panelTypes, themes, userTypes } from "./constants";
+import {
+    PanelDataTypes,
+    PanelEventTypes,
+    ThemeNames,
+    UserTypes,
+} from "./constants";
 
 export type User = {
-	id: number;
-	microsoftId: string;
-	name: string;
-	email: string;
-	type: (typeof userTypes)[number];
+    id: number;
+    microsoftId: string;
+    name: string;
+    email: string;
+    type: (typeof UserTypes)[number];
 };
 
-type BaseActivity = {
-	id: number;
-	panel: Panel["id"];
-	author: User["id"];
-	sentAt: Date;
-	type: (typeof activityTypes)[number];
-	data: object;
-	hidden: boolean;
+/*----------------------------------------*\
+|    Panels                                |
+\*----------------------------------------*/
+
+export type Panel = {
+    id: number;
+    author: User["id"];
+    showFrom: Date;
+    showTill: Date;
+    isApproved: boolean | null;
+    visibilityOverride: boolean | null;
+    panelData: PanelData["id"];
+    displayDuration: number;
 };
 
-export type UserRequestAddPanel = BaseActivity & {
-	type: "user:request:addPanel";
-	data: {};
+type PanelDataBase = {
+    id: number;
+    type: (typeof PanelDataTypes)[number];
 };
 
-export type AdminAddPanel = BaseActivity & {
-	type: "admin:addPanel";
-	data: {};
+export type ImagePanel = PanelDataBase & {
+    type: "image";
+    content: {
+        url: string;
+    };
 };
 
-export type AdminAccept = BaseActivity & {
-	type: "admin:accept";
-	data: {};
+export type VideoPanel = PanelDataBase & {
+    type: "video";
+    content: {
+        url: string;
+    };
 };
 
-export type AdminReject = BaseActivity & {
-	type: "admin:reject";
-	data: {};
+export type TextPanel = PanelDataBase & {
+    type: "text";
+    content: {
+        content: string;
+        backgroundImage: PanelBackground["id"];
+        textColor: PanelBackground["textColor"];
+    };
 };
 
-export type AdminChangeTime = BaseActivity & {
-	type: "admin:changeTime";
-	data: {
-		oldShowFrom: Date;
-		oldShowTill: Date;
-		newShowFrom: Date;
-		newShowTill: Date;
-	};
+export type IframePanel = PanelDataBase & {
+    type: "iframe";
+    content: {
+        url: string;
+    };
 };
 
-export type AdminChangeVisibility = BaseActivity & {
-	type: "admin:changeVisibility";
-	data: {
-		newVisibility: boolean;
-	};
-};
-
-export type AdminChangeShowFor = BaseActivity & {
-	type: "admin:changeShowFor";
-	data: {
-		oldShowFor: number;
-		newShowFor: number;
-	};
-};
-
-export type AdminChangeContent = BaseActivity & {
-	type: "admin:changeContent";
-	data: {
-		oldContent: string;
-		newContent: string;
-	};
-};
-
-export type Activity = UserRequestAddPanel | AdminAddPanel | AdminAccept | AdminReject | AdminChangeTime | AdminChangeVisibility | AdminChangeShowFor | AdminChangeContent;
-
-type BasePanel = {
-	id: number;
-	author: User["id"];
-	showFrom: Date;
-	showTill: Date;
-	isApproved: boolean;
-	isDeprecated: boolean;
-	isHidden: boolean;
-	type: (typeof panelTypes)[number];
-	showFor: number;
-};
-
-export type ImagePanel = BasePanel & {
-	type: "image";
-	content: {
-		url: string;
-	};
-};
-
-export type VideoPanel = BasePanel & {
-	type: "video";
-	content: {
-		url: string;
-	};
-};
-
-export type TextPanel = BasePanel & {
-	type: "text";
-	content: {
-		content: string;
-		background: PanelBackground["id"];
-		textColor: PanelBackground["textColor"];
-	};
-};
-
-export type IframePanel = BasePanel & {
-	type: "iframe";
-	content: {
-		url: string;
-	};
-};
-
-export type Panel = ImagePanel | VideoPanel | TextPanel;
-
-export type DisplayPanel = {
-	id: Panel["id"];
-	showFor: Panel["showFor"];
-} & (
-	| {
-			type: ImagePanel["type"];
-			content: ImagePanel["content"];
-	  }
-	| {
-			type: VideoPanel["type"];
-			content: VideoPanel["content"];
-	  }
-	| {
-			type: TextPanel["type"];
-			content: TextPanel["content"];
-	  }
-);
+export type PanelData = ImagePanel | VideoPanel | TextPanel | IframePanel;
 
 export type PanelBackground = {
-	id: number;
-	fileName: string;
-	textColor: string;
-	disabled: boolean;
+    id: number;
+    url: string;
+    textColor: string;
+    disabled: boolean;
 };
 
-export type Canteen = {
-	snack: string | null;
-	soup: string | null;
-	lunch1: string | null;
-	lunch2: string | null;
-	lunch3: string | null;
-	commonSuffix: string | null;
+/*----------------------------------------*\
+|    Panel events                          |
+\*----------------------------------------*/
+
+type PanelEventBase = {
+    id: number;
+    panel: Panel["id"];
+    author: User["id"];
+    sentAt: Date;
+    type: (typeof PanelEventTypes)[number];
+    data: object;
+    hidden: boolean;
 };
 
-export type Departures = {
-	ladova: Departure[];
-	natrati: Departure[];
-	vlak: Departure[];
+export type UserRequestAddPanel = PanelEventBase & {
+    type: "user:request:addPanel";
+    data: {};
 };
 
-export type Departure = {
-	carrier: "DPMO" | "CD" | "other";
-	line: string;
-	time: string;
-	delay: string | null;
-	destination: string;
+export type AdminAddPanel = PanelEventBase & {
+    type: "admin:addPanel";
+    data: {};
 };
 
-export type Theme = (typeof themes)[number];
+export type AdminAcceptPanel = PanelEventBase & {
+    type: "admin:acceptPanel";
+    data: {};
+};
+
+export type AdminRejectPanel = PanelEventBase & {
+    type: "admin:rejectPanel";
+    data: {};
+};
+
+export type AdminChangeTime = PanelEventBase & {
+    type: "admin:change:time";
+    data: {
+        oldShowFrom: Date;
+        oldShowTill: Date;
+        newShowFrom: Date;
+        newShowTill: Date;
+    };
+};
+
+export type AdminChangeVisibilityOverride = PanelEventBase & {
+    type: "admin:change:visibilityOverride";
+    data: {
+        newVisibility: boolean | null;
+    };
+};
+
+export type AdminChangeDuration = PanelEventBase & {
+    type: "admin:change:displayDuration";
+    data: {
+        oldDuration: number;
+        newDuration: number;
+    };
+};
+
+export type AdminChangePanelData = PanelEventBase & {
+    type: "admin:change:panelData";
+    data: {
+        oldContent: string;
+        newContent: string;
+    };
+};
+
+export type PanelEvent =
+    | UserRequestAddPanel
+    | AdminAddPanel
+    | AdminAcceptPanel
+    | AdminRejectPanel
+    | AdminChangeTime
+    | AdminChangeVisibilityOverride
+    | AdminChangeDuration
+    | AdminChangePanelData;
+
+/*----------------------------------------*\
+|    Client types                          |
+\*----------------------------------------*/
 
 export type Configuration = {
-	theme: Theme;
-	timetableEnabled: boolean;
-	canteenEnabled: boolean;
-	departuresEnabled: boolean;
+    theme: Theme;
+    timetableEnabled: boolean;
+    canteenEnabled: boolean;
+    departuresEnabled: boolean;
 };
 
 export type ClientState = Configuration & {
-	online: boolean;
-	panels: DisplayPanel[];
-	canteen: Canteen;
-	departures: Departures;
+    online: boolean;
+    panels: ClientPanelData[];
+    canteen: Canteen;
+    departures: Departures;
 };
 
+export type Canteen = {
+    snack: string | null;
+    soup: string | null;
+    lunch1: string | null;
+    lunch2: string | null;
+    lunch3: string | null;
+    commonSuffix: string | null;
+};
+
+export type Departures = {
+    ladova: Departure[];
+    natrati: Departure[];
+    vlak: Departure[];
+};
+
+export type Departure = {
+    carrier: "DPMO" | "CD" | "other";
+    line: string;
+    time: string;
+    delay: string | null;
+    destination: string;
+};
+
+export type Theme = (typeof ThemeNames)[number];
+
+export type ClientPanelData = PanelData & {
+    displayDuration: Panel["displayDuration"];
+};
+
+/*----------------------------------------*\
+|    Utilities                             |
+\*----------------------------------------*/
+
 export type Only<T, U> = {
-	[P in keyof T]: T[P];
+    [P in keyof T]: T[P];
 } & {
-	[P in keyof U]?: never;
+    [P in keyof U]?: never;
 };
 
 export type Either<T, U> = Only<T, U> | Only<U, T>;
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
 
-export type FunctionDetails<F> = F extends (...args: infer Args) => infer Result ? { args: Args; result: Result } : never;
+export type FunctionDetails<F> = F extends (...args: infer Args) => infer Result
+    ? { args: Args; result: Result }
+    : never;
 
-export type AsyncFunctionDetails<F> = F extends (...args: infer Args) => Promise<infer Result> ? { args: Args; result: Result } : never;
+export type AsyncFunctionDetails<F> = F extends (
+    ...args: infer Args
+) => Promise<infer Result>
+    ? { args: Args; result: Result }
+    : never;

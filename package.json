@@ -35,6 +35,8 @@
     "onlyBuiltDependencies": [
       "@swc/core",
       "esbuild",
+      "prettier",
+      "prettier-plugin-tailwindcss",
       "sharp"
     ]
   },
