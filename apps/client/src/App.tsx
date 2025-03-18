@@ -7,7 +7,7 @@ function App() {
     const clientState = useClientState();
 
     return (
-        <main className="grid h-dvh w-dvw grid-cols-[75fr,25fr]">
+        <main className="grid h-dvh w-dvw grid-cols-[75fr,25fr] overflow-hidden">
             <ClientStateProvider clientState={clientState}>
                 <Carousel />
                 <Info />

@@ -46,12 +46,12 @@ const fetchDeparturesFromURL = async (
                     departures[departures.length - 1].delay =
                         row.children[2]
                             .querySelector("a")
-                            ?.innerText.replace(
+                            ?.innerText?.replace(
                                 /Aktuální zpoždění ([0-9]+) min.*/,
                                 "$1",
                             )
-                            .replace("Aktuálně bez zpoždění", "")
-                            .replace("Nepředpokládá se zpoždění", "") ?? null;
+                            ?.replace("Aktuálně bez zpoždění", "")
+                            ?.replace("Nepředpokládá se zpoždění", "") ?? null;
                     if (departures[departures.length - 1].delay === "")
                         departures[departures.length - 1].delay = null;
 

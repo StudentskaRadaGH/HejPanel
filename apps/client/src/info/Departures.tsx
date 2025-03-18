@@ -9,14 +9,16 @@ interface DeparturesFromStopProps {
 
 const DeparturesFromStop = ({ name, departures }: DeparturesFromStopProps) => {
     return (
-        <div className="grid w-full grid-cols-[auto,auto,auto,1fr] items-center gap-x-1 gap-y-2">
+        <div className="grid w-full grid-cols-[auto,auto,auto,1fr] items-center gap-x-2 gap-y-1">
             <div className="nunito-bold col-span-4 text-lg">{name}:</div>
             {departures.map((departure) => (
                 <DepartureRow
                     key={
+                        departure.time +
+                        "-" +
                         departure.line +
-                        departure.carrier +
-                        departure.destination.substring(-5)
+                        "-" +
+                        departure.destination.substring(0, 5)
                     }
                     departure={departure}
                 />

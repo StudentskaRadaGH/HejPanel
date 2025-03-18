@@ -6,7 +6,7 @@ const Carousel = () => {
     const online = useOnline();
 
     return (
-        <div className="flex h-full w-full items-center justify-center bg-zinc-900">
+        <div className="flex h-dvh w-full items-center justify-center bg-zinc-900">
             {online ? <Online /> : <OfflineFallback />}
         </div>
     );

@@ -8,7 +8,7 @@ interface DepartureProps {
 const Departure = ({ departure }: DepartureProps) => {
     return (
         <>
-            <div className="nunito-bold">{departure.time}</div>
+            <div className="nunito-bold text-right">{departure.time}</div>
             <div className="nunito-bold text-[0.6em]">
                 {departure.delay && `+${departure.delay}`}
             </div>
