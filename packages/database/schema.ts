@@ -4,6 +4,7 @@ import {
     PanelEvent,
     PanelEventTypes,
     ThemeNames,
+    User,
     UserTypes,
 } from "types";
 import {
@@ -46,6 +47,10 @@ export const Users = pgTable("users", {
     name: varchar("name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     type: UserTypesEnum("type").notNull().default(UserTypes[0]),
+    colors: jsonb("colors").notNull().$type<User["colors"]>().default({
+        dark: "#000000",
+        light: "#ffffff",
+    }),
 });
 
 export const UsersRelations = relations(Users, ({ many }) => ({

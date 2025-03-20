@@ -12,6 +12,10 @@ export type User = {
     name: string;
     email: string;
     type: (typeof UserTypes)[number];
+    colors: {
+        light: string;
+        dark: string;
+    };
 };
 
 /*----------------------------------------*\
