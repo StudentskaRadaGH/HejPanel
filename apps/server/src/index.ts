@@ -16,8 +16,8 @@ import { ConfigurationManager } from "./managers/configurationManager";
 import { DeparturesManager } from "./managers/departuresManager";
 import { PanelsManager } from "./managers/panelsManager";
 import { Server } from "socket.io";
+import { env } from "env";
 import express from "express";
-import { privateEnv } from "env";
 
 // #region Server setup
 const REST_API = express();
@@ -25,7 +25,7 @@ REST_API.use(express.json());
 
 const WS_SERVER = new Server({
     cors: {
-        origin: [privateEnv.ADMIN_URL, privateEnv.CLIENT_URL],
+        origin: [env.ADMIN_URL, env.CLIENT_URL],
     },
 });
 
@@ -171,8 +171,8 @@ configuration
     .then(
         async () =>
             await Promise.all([
-                REST_API.listen(privateEnv.SERVER_PORT),
-                WS_SERVER.listen(privateEnv.WS_PORT),
+                REST_API.listen(env.SERVER_PORT),
+                WS_SERVER.listen(env.WS_PORT),
             ]),
     )
     .then(printServerReady);

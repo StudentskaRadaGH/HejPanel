@@ -1,5 +1,11 @@
 import { CSSProperties, createContext, useContext } from "react";
-import { Canteen, ClientState, Departures, DisplayPanel, Theme } from "types";
+import {
+    Canteen,
+    ClientPanelData,
+    ClientState,
+    Departures,
+    Theme,
+} from "types";
 import { ThemeConfiguration, themesConfig } from "./assets/themes";
 
 interface ThemeContextType extends ThemeConfiguration {
@@ -51,7 +57,8 @@ const useClientStateContext = () => {
 
 export const useOnline = (): boolean => useClientStateContext().online;
 
-export const usePanels = (): DisplayPanel[] => useClientStateContext().panels;
+export const usePanels = (): ClientPanelData[] =>
+    useClientStateContext().panels;
 
 export const useTheme = (): ThemeContextType =>
     getThemeContext(useClientStateContext().theme);

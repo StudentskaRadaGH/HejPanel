@@ -1,110 +1,123 @@
-import { Canteen, ClientState, Departures, DisplayPanel, Theme } from "types";
+import {
+    Canteen,
+    ClientPanelData,
+    ClientState,
+    Departures,
+    Theme,
+} from "types";
 import { useEffect, useState } from "react";
 
+import { PUBLIC_ENV } from "env/public";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:4000");
+const socket = io(PUBLIC_ENV.WS_URL);
 
 export default function useClientState(): ClientState {
-	const [online, setOnline] = useState(socket.connected);
+    const [online, setOnline] = useState(socket.connected);
 
-	const [panels, setPanels] = useState<DisplayPanel[]>([]);
+    const [panels, setPanels] = useState<ClientPanelData[]>([]);
 
-	const [theme, setTheme] = useState<Theme>("normal");
+    const [theme, setTheme] = useState<Theme>("normal");
 
-	const [timetableEnabled, setTimetableEnabled] = useState(false);
+    const [timetableEnabled, setTimetableEnabled] = useState(false);
 
-	const [canteenEnabled, setIsCanteenEnabled] = useState(false);
-	const [canteen, setCanteen] = useState<Canteen>({
-		snack: null,
-		soup: null,
-		lunch1: null,
-		lunch2: null,
-		lunch3: null,
-		commonSuffix: null,
-	});
+    const [canteenEnabled, setIsCanteenEnabled] = useState(false);
+    const [canteen, setCanteen] = useState<Canteen>({
+        snack: null,
+        soup: null,
+        lunch1: null,
+        lunch2: null,
+        lunch3: null,
+        commonSuffix: null,
+    });
 
-	const [departuresEnabled, setIsDeparturesEnabled] = useState(false);
-	const [departures, setDepartures] = useState<Departures>({
-		ladova: [],
-		natrati: [],
-		vlak: [],
-	});
+    const [departuresEnabled, setIsDeparturesEnabled] = useState(false);
+    const [departures, setDepartures] = useState<Departures>({
+        ladova: [],
+        natrati: [],
+        vlak: [],
+    });
 
-	useEffect(() => {
-		const onConnect = () => setOnline(true);
-		const onDisconnect = () => setOnline(false);
+    useEffect(() => {
+        const onConnect = () => setOnline(true);
+        const onDisconnect = () => setOnline(false);
 
-		const onPanelAdd = (panel: DisplayPanel) => setPanels((panels) => [...panels, panel]);
-		const onPanelRemove = (panelId: number) => setPanels((panels) => panels.filter((p) => p.id !== panelId));
+        const onPanelAdd = (panel: ClientPanelData) =>
+            setPanels((panels) => [...panels, panel]);
+        const onPanelRemove = (panelId: number) =>
+            setPanels((panels) => panels.filter((p) => p.id !== panelId));
 
-		const onThemeChange = (newTheme: Theme) => setTheme(newTheme);
+        const onThemeChange = (newTheme: Theme) => setTheme(newTheme);
 
-		const onTimetableEnable = (isTimetableEnabled: boolean) => setTimetableEnabled(isTimetableEnabled);
+        const onTimetableEnable = (isTimetableEnabled: boolean) =>
+            setTimetableEnabled(isTimetableEnabled);
 
-		const onCanteenEnable = (isCanteenEnabled: boolean) => setIsCanteenEnabled(isCanteenEnabled);
-		const onCanteenUpdate = (newCanteen: Canteen) => setCanteen(newCanteen);
+        const onCanteenEnable = (isCanteenEnabled: boolean) =>
+            setIsCanteenEnabled(isCanteenEnabled);
+        const onCanteenUpdate = (newCanteen: Canteen) => setCanteen(newCanteen);
 
-		const onDeparturesEnable = (isDeparturesEnabled: boolean) => setIsDeparturesEnabled(isDeparturesEnabled);
-		const onDeparturesUpdate = (newDepartures: Departures) => setDepartures(newDepartures);
+        const onDeparturesEnable = (isDeparturesEnabled: boolean) =>
+            setIsDeparturesEnabled(isDeparturesEnabled);
+        const onDeparturesUpdate = (newDepartures: Departures) =>
+            setDepartures(newDepartures);
 
-		const onSync = (state: ClientState) => {
-			setTheme(state.theme);
-			setTimetableEnabled(state.timetableEnabled);
-			setIsCanteenEnabled(state.canteenEnabled);
-			setCanteen(state.canteen);
-			setIsDeparturesEnabled(state.departuresEnabled);
-			setDepartures(state.departures);
-			setPanels(state.panels);
-		};
+        const onSync = (state: ClientState) => {
+            setTheme(state.theme);
+            setTimetableEnabled(state.timetableEnabled);
+            setIsCanteenEnabled(state.canteenEnabled);
+            setCanteen(state.canteen);
+            setIsDeparturesEnabled(state.departuresEnabled);
+            setDepartures(state.departures);
+            setPanels(state.panels);
+        };
 
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
+        socket.on("connect", onConnect);
+        socket.on("disconnect", onDisconnect);
 
-		socket.on("panel:add", onPanelAdd);
-		socket.on("panel:remove", onPanelRemove);
+        socket.on("panel:add", onPanelAdd);
+        socket.on("panel:remove", onPanelRemove);
 
-		socket.on("theme", onThemeChange);
+        socket.on("theme", onThemeChange);
 
-		socket.on("timetable:enable", onTimetableEnable);
+        socket.on("timetable:enable", onTimetableEnable);
 
-		socket.on("canteen:enable", onCanteenEnable);
-		socket.on("canteen:update", onCanteenUpdate);
+        socket.on("canteen:enable", onCanteenEnable);
+        socket.on("canteen:update", onCanteenUpdate);
 
-		socket.on("departures:enable", onDeparturesEnable);
-		socket.on("departures:update", onDeparturesUpdate);
+        socket.on("departures:enable", onDeparturesEnable);
+        socket.on("departures:update", onDeparturesUpdate);
 
-		socket.on("sync", onSync);
+        socket.on("sync", onSync);
 
-		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
+        return () => {
+            socket.off("connect", onConnect);
+            socket.off("disconnect", onDisconnect);
 
-			socket.off("panel:add", onPanelAdd);
-			socket.off("panel:remove", onPanelRemove);
+            socket.off("panel:add", onPanelAdd);
+            socket.off("panel:remove", onPanelRemove);
 
-			socket.off("theme", onThemeChange);
+            socket.off("theme", onThemeChange);
 
-			socket.off("timetable:enable", onTimetableEnable);
+            socket.off("timetable:enable", onTimetableEnable);
 
-			socket.off("canteen:enable", onCanteenEnable);
-			socket.off("canteen:update", onCanteenUpdate);
+            socket.off("canteen:enable", onCanteenEnable);
+            socket.off("canteen:update", onCanteenUpdate);
 
-			socket.off("departures:enable", onDeparturesEnable);
-			socket.off("departures:update", onDeparturesUpdate);
+            socket.off("departures:enable", onDeparturesEnable);
+            socket.off("departures:update", onDeparturesUpdate);
 
-			socket.off("sync", onSync);
-		};
-	}, []);
+            socket.off("sync", onSync);
+        };
+    }, []);
 
-	return {
-		online,
-		panels,
-		theme,
-		timetableEnabled,
-		canteenEnabled,
-		canteen,
-		departuresEnabled,
-		departures,
-	};
+    return {
+        online,
+        panels,
+        theme,
+        timetableEnabled,
+        canteenEnabled,
+        canteen,
+        departuresEnabled,
+        departures,
+    };
 }

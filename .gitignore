@@ -13,4 +13,6 @@ pnpm-lock.yaml
 **/out
 
 **/dist
-.env
+
+packages/env/env.ts
+packages/env/publicEnv.ts
